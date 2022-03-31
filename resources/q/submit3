@@ -1,0 +1,43 @@
+#!/bin/bash
+clear
+ kubectl get pods my-multi-pod --no-headers -n=default  -o=custom-columns='NAME:metadata.name','NAMESPACE:metadata.namespace','CONTAINERS:spec.containers.*.name','IMAGE:spec.containers.*.image','STATUS:.status.phase','LABELS:metadata.labels','NODENAME:spec.nodeName','CONTAINERS_READY:status.conditions[?(@.type=="ContainersReady")].status','POD_IP:status.podIP' > /tmp/answer3
+
+FILE=/tmp/answer3
+if test -f "$FILE"; then
+    printf "Starting... \\n\\n"
+else
+    printf "Please submit your answer first\\n\\n"
+    exit 1
+fi
+
+pod=$(awk '{ a=$1 ; print a }'  /vagrant/resources/a/question3)
+namespace=$(awk '{ a=$2 ; print a }'  /vagrant/resources/a/question3)
+container=$(awk '{ a=$3 ; print a }'  /vagrant/resources/a/question3)
+image=$(awk '{ a=$4 ; print a }'  /vagrant/resources/a/question3)
+status=$(awk '{ a=$5 ; print a }'  /vagrant/resources/a/question3)
+labels=$(awk '{ a=$6 ; print a }'  /vagrant/resources/a/question3)
+node=$(awk '{ a=$7 ; print a }'  /vagrant/resources/a/question3)
+ready=$(awk '{ a=$8 ; print a }'  /vagrant/resources/a/question3)
+podip=$(awk '{ a=$9 ; print a }'  /vagrant/resources/a/question3)
+
+apod=$(awk '{ a=$1 ; print a }'  /tmp/answer3)
+anamespace=$(awk '{ a=$2 ; print a }'  /tmp/answer3)
+acontainer=$(awk '{ a=$3 ; print a }'  /tmp/answer3)
+aimage=$(awk '{ a=$4 ; print a }'  /tmp/answer3)
+astatus=$(awk '{ a=$5 ; print a }'  /tmp/answer3)
+alabels=$(awk '{ a=$6 ; print a }'  /tmp/answer3)
+anode=$(awk '{ a=$7 ; print a }'  /tmp/answer3)
+aready=$(awk '{ a=$8 ; print a }'  /tmp/answer3)
+apodip=$(awk '{ a=$9 ; print a }'  /tmp/answer3)
+
+if [ $pod == "$apod" ]; then echo "Pod Found"; else printf "Pod $pod not found in default namespace\\n\\n" && exit 1; fi
+if [ $container == "$acontainer" ]; then echo "Containers name correct"; else printf "Containers Name incorrect\\n\\n" && exit 1; fi
+if [ $image == "$aimage" ]; then echo "Images correct"; else printf "Images incorrect\\n\\n" && exit 1; fi
+if [ $status == "$astatus" ]; then echo "Pod Running"; else printf "Pod $pod not running\\n\\n" && exit 1; fi
+if [ $ready == "$aready" ]; then echo "Pod Ready"; else printf "Pod NOT Ready\\n\\n" && exit 1; fi
+
+printf "\\n\\n"
+echo "You can now delete your my-multi-pod POD"
+printf "Congratulations, you got that right!!!\\n\\n"
+
+rm /tmp/answer3

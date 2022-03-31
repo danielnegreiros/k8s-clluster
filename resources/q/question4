@@ -1,0 +1,6 @@
+#!/bin/bash
+clear
+echo "Question 4: Create a Replica Set named my-replica-set setting the image consul for the pods."
+printf "Set 2 replicas for this application and name the container myapp\\n\\n"
+printf "To Submit type: submit4\\n"
+printf "To get a hint  type: hint4\\n\\n"

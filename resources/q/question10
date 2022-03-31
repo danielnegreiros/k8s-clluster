@@ -1,0 +1,8 @@
+#!/bin/bash
+clear
+
+echo "Question 10: Create a POD names redis with the redis image and the labels app=database and env=production"
+echo ""
+echo ""
+printf "To Submit type: submit10\\n"
+printf "To get a hint  type: hint10\\n\\n"

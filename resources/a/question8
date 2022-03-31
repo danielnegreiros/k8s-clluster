@@ -1,0 +1,1 @@
+nginx-deploy-1   default   nginx:1.18   RollingUpdate   2

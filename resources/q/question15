@@ -1,0 +1,7 @@
+#!/bin/bash
+clear
+echo "Question 15: There is a namespace for Kubernetes internal processes and management"
+echo "Try to figure out which namespace it is and list all the PODs of this namespace redirecting output to /tmp/kube-mgmt"
+printf "\\n\\n"
+printf "To Submit type: submit15\\n"
+printf "To get a hint  type: hint15\\n\\n"

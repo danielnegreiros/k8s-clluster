@@ -1,0 +1,6 @@
+#!/bin/bash
+clear
+
+echo "You can use manifest file and set your label, which is best"
+echo "or you can create the POD with commands and the change it with kubectl label, which is faster (I think)"
+printf "\\n\\\n"

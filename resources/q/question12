@@ -1,0 +1,8 @@
+#!/bin/bash
+clear
+
+echo "Question 12: New Deployments were created, scale up to 2 replicas only the deployments with label app=frontend"
+echo ""
+echo ""
+printf "To Submit type: submit12\\n"
+printf "To get a hint  type: hint12\\n\\n"

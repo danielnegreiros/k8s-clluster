@@ -1,0 +1,26 @@
+#!/bin/bash
+clear
+kubectl get deployments.apps -o=custom-columns='IMAGE:spec.template.spec.containers[*].image','NAME:metadata.name' | grep nginx-deploy- > /tmp/answer7
+kubectl get deployments.apps | grep nginx-deploy- | awk '{print $2}' >> /tmp/answer7
+FILE=/tmp/answer7
+if test -f "$FILE"; then
+    printf "Starting... \\n\\n"
+else
+    printf "Please submit your answer first\\n\\n"
+    exit 1
+fi
+
+img1=$(sed -n '1,1p' /vagrant/resources/a/question7  | awk '{ a=$1 ; print a }')
+img2=$(sed -n '2,2p' /vagrant/resources/a/question7  | awk '{ a=$1 ; print a }')
+red1=$(sed -n '3,3p' /vagrant/resources/a/question7  | awk '{ a=$1 ; print a }')
+red2=$(sed -n '4,4p' /vagrant/resources/a/question7  | awk '{ a=$1 ; print a }')
+
+aimg1=$(sed -n '1,1p' /vagrant/resources/a/question7 /tmp/answer7 | awk '{ a=$1 ; print a }')
+aimg2=$(sed -n '2,2p' /vagrant/resources/a/question7 /tmp/answer7 | awk '{ a=$1 ; print a }')
+ared1=$(sed -n '3,3p' /vagrant/resources/a/question7 /tmp/answer7 | awk '{ a=$1 ; print a }')
+ared2=$(sed -n '4,4p' /vagrant/resources/a/question7 /tmp/answer7 | awk '{ a=$1 ; print a }')
+
+if [ $img1 == "$aimg1" ]; then echo "Image deployment 1 correct: $img1"; else printf "Image deployment 1 incorrect\\n\\n" && exit 1; fi
+if [ $img2 == "$aimg2" ]; then echo "Image deployment 2 correct: $img2"; else printf "Image deployment 2 incorrect\\n\\n" && exit 1; fi
+if [ $red1 == "$ared1" ]; then echo "Deployment 1 POD Ready number is correct : $red1"; else printf "Deployment 1 Pod Ready number is incorrect: $ared1" && exit 1; fi
+if [ $red2 == "$ared2" ]; then echo "Deployment 2 POD Ready number is correct: $red2"; else printf "Deployment 2 POD Ready number is incorrect: $ared2" && exit 1; fi

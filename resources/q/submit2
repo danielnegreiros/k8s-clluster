@@ -1,0 +1,43 @@
+#!/bin/bash
+clear
+ kubectl get pods my-pod --no-headers -n=default  -o=custom-columns='NAME:metadata.name','NAMESPACE:metadata.namespace','CONTAINERS:spec.containers.*.name','IMAGE:spec.containers.*.image','STATUS:.status.phase','LABELS:metadata.labels','NODENAME:spec.nodeName','CONTAINERS_READY:status.conditions[?(@.type=="ContainersReady")].status','POD_IP:status.podIP' > /tmp/answer2
+
+FILE=/tmp/answer2
+if test -f "$FILE"; then
+    printf "Starting... \\n\\n"
+else
+    printf "Please submit your answer first\\n\\n"
+    exit 1
+fi
+
+pod=$(awk '{ a=$1 ; print a }'  /vagrant/resources/a/question2)
+namespace=$(awk '{ a=$2 ; print a }'  /vagrant/resources/a/question2)
+container=$(awk '{ a=$3 ; print a }'  /vagrant/resources/a/question2)
+image=$(awk '{ a=$4 ; print a }'  /vagrant/resources/a/question2)
+status=$(awk '{ a=$5 ; print a }'  /vagrant/resources/a/question2)
+labels=$(awk '{ a=$6 ; print a }'  /vagrant/resources/a/question2)
+node=$(awk '{ a=$7 ; print a }'  /vagrant/resources/a/question2)
+ready=$(awk '{ a=$8 ; print a }'  /vagrant/resources/a/question2)
+podip=$(awk '{ a=$9 ; print a }'  /vagrant/resources/a/question2)
+
+apod=$(awk '{ a=$1 ; print a }'  /tmp/answer2)
+anamespace=$(awk '{ a=$2 ; print a }'  /tmp/answer2)
+acontainer=$(awk '{ a=$3 ; print a }'  /tmp/answer2)
+aimage=$(awk '{ a=$4 ; print a }'  /tmp/answer2)
+astatus=$(awk '{ a=$5 ; print a }'  /tmp/answer2)
+alabels=$(awk '{ a=$6 ; print a }'  /tmp/answer2)
+anode=$(awk '{ a=$7 ; print a }'  /tmp/answer2)
+aready=$(awk '{ a=$8 ; print a }'  /tmp/answer2)
+apodip=$(awk '{ a=$9 ; print a }'  /tmp/answer2)
+
+if [ $pod == "$apod" ]; then echo "Pod Found"; else printf "Pod $pod not found in default namespace\\n\\n" && exit 1; fi
+if [ $container == "$acontainer" ]; then echo "Container name correct"; else printf "Container Name incorrect\\n\\n" && exit 1; fi
+if [ $image == "$aimage" ]; then echo "Image correct"; else printf "Image incorrect\\n\\n" && exit 1; fi
+if [ $status == "$astatus" ]; then echo "Pod Running"; else printf "Pod $pod not running\\n\\n" && exit 1; fi
+if [ $ready == "$aready" ]; then echo "Pod Ready"; else printf "Pod NOT Ready\\n\\n" && exit 1; fi
+
+printf "\\n\\n"
+echo "You can now delete the my-pod POD"
+printf "Congratulations, you got that right!!!\\n\\n"
+
+rm /tmp/answer2

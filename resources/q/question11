@@ -1,0 +1,8 @@
+#!/bin/bash
+clear
+
+echo "Question 11: POD redis is actually working on testing environment and we don't use app label anymore, please correct labels"
+echo ""
+echo ""
+printf "To Submit type: submit11\\n"
+printf "To get a hint  type: hint11\\n\\n"

@@ -1,0 +1,5 @@
+#!/bin/bash
+clear
+echo "Hint: Use the command kubectl run hel \"kubectl run -h\" and take a look at some examples"
+echo "You can use kubectl describe pod xxxxx" to look for more error information.
+printf "If you need you can delete and re-create the pod, replace is also available\\n\n\\"

@@ -1,0 +1,4 @@
+#!/bin/bash
+clear
+printf "Hint: Use kubectl scale -h and take a look at some examples\\n"
+printf "Make sure all PODs of replicaset are running the new image\\n\\n"

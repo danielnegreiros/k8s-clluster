@@ -1,0 +1,10 @@
+#!/bin/bash
+clear
+
+echo "Analyze the Deployment spec with  kubectl explain deployment.spec"
+echo "Or you can use the documentation: https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#deploymentspec-v1-apps"
+echo "Search for strategies"
+echo "There are some ways to edit an existing object if you don't have the manifest file:"
+echo "  - Kubectl edit, use the help tool for more information => kubectl edit deployment -h"
+echo "  - Generate a yaml file from a current object and then edit it =>  kubectl get "object" "name-of-object" -o yaml > my-file.yaml"
+printf "\\n\\\n"

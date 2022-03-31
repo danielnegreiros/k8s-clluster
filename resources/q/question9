@@ -1,0 +1,8 @@
+#!/bin/bash
+clear
+
+echo "Question 9: Finally rollback the nginx deployment 1 to the previous point where the problem has been fixed and image is nginx:1.17"
+echo ""
+echo ""
+printf "To Submit type: submit9\\n"
+printf "To get a hint  type: hint9\\n\\n"

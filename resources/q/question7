@@ -1,0 +1,25 @@
+#!/bin/bash
+clear
+
+FILE=~/07-deployments.yaml
+if test -f "$FILE"; then
+    printf ""
+else
+    cp /vagrant/resources/07-deployments.yaml ~/
+    cp /vagrant/resources/testing.sh ~/
+    chmod +x testing.sh
+    kubectl apply -f ~/07-deployments.yaml  > /dev/null 2>&1
+fi
+
+echo "Question 7: There are 2 new nginx deployments created. Please take a look"
+echo "There is a script called testing.sh at home directory. Wait for the PODs to go RUNNING"
+echo "And execute the script. The script is checking and using the Deployments services"
+echo "The deployments are both using nginx:1.16, update both images to nginx:1.17 and right after execute testing.sh to check services"
+echo "If you like better, you can run testing.sh before updating the images in another tab"
+echo "You can do both deployments at a time, or you can do it one by one to not rush."
+echo "CTRL-C if you want to stop testing.sh"
+echo ""
+echo "You should notice that something different is happening between the 2 deployments"
+echo ""
+printf "To Submit type: submit7\\n"
+printf "To get a hint  type: hint7\\n\\n"

@@ -1,0 +1,17 @@
+#!/bin/bash
+clear
+
+
+FILE=~/02-my-pod.yaml
+if test -f "$FILE"; then
+    printf ""
+else
+    cp /vagrant/resources/02-my-pod.yaml ~/
+    kubectl apply -f ~/02-my-pod.yaml  > /dev/null 2>&1
+fi
+
+echo  "Question 2: Someone created the pod called my-pod, the name of container should be my-redis, image should be redis, but it's not working"
+printf "The yaml file used is at /vagrant/02-my-pod.yaml. Find the problem and fix it\\n\\n"
+
+printf "To Submit type: submit2\\n"
+printf "To get a hint  type: hint2\\n\\n"

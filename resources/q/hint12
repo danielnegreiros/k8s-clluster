@@ -1,0 +1,5 @@
+#!/bin/bash
+clear
+
+echo "List objects with requested label and then scale"
+printf "\\n\\\n"

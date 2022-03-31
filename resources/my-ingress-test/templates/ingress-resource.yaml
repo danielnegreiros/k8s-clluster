@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /finance
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-finance-service
+            port:
+              number: 80
+      - path: /hr
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-hr-service
+            port:
+              number: 80

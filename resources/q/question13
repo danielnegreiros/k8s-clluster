@@ -1,0 +1,9 @@
+#!/bin/bash
+clear
+
+echo "Question 13: There are certain PODs that can only we scheduled on worker02 because it's disk is ssd"
+echo "Please, label worker02 appropriately"
+echo ""
+echo ""
+printf "To Submit type: submit13\\n"
+printf "To get a hint  type: hint13\\n\\n"

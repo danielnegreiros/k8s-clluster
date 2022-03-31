@@ -1,0 +1,5 @@
+#!/bin/bash
+clear
+printf "Question 14: Create a pod named nginx with the nginx image in the testing namespace\\n\\n"
+printf "To Submit type: submit14\\n"
+printf "To get a hint  type: hint14\\n\\n"

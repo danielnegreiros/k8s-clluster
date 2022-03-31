@@ -1,0 +1,6 @@
+#!/bin/bash
+clear
+
+echo "Use rollout history deployment "name-of-deployment" to check list of revisions"
+echo "Use rollout undo to rollback to the right version => kubectl rollout undo deployment -h"
+printf "\\n\\\n"

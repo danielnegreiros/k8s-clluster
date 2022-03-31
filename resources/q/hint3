@@ -1,0 +1,5 @@
+#!/bin/bash
+clear
+printf "Hint: Use the command kubectl run help \"kubectl run -h\" and take a look at some examples\\n"
+echo "Make use of dry-run=client tool to edit your yaml file"
+printf "Make use of 'kubectl explain pod' if you find useful\\n\\n"

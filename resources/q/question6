@@ -1,0 +1,15 @@
+#!/bin/bash
+clear
+
+FILE=~/06-my-rs.yaml
+if test -f "$FILE"; then
+    printf ""
+else
+    cp /vagrant/resources/06-my-rs.yaml ~/
+fi
+
+echo  "Question 6: Someone is trying to create the RS my-new-rp with 3 replicas but it's not working"
+printf "The yaml file used is at ~/06-my-rs.yaml. Find the problem and fix it\\n\\n"
+
+printf "To Submit type: submit6\\n"
+printf "To get a hint  type: hint6\\n\\n"

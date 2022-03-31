@@ -1,0 +1,6 @@
+#!/bin/bash
+clear
+echo "Question 16: A lost POD lost-pod was created, try to figure out it's namespace"
+printf "\\n\\n"
+printf "To Submit type: submit16\\n"
+printf "To get a hint  type: hint16\\n\\n"

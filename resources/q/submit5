@@ -1,0 +1,40 @@
+#!/bin/bash
+clear
+  kubectl get rs my-replica-set --no-headers  -n=default  -o=custom-columns='NAME:metadata.name','NAMESPACE:metadata.namespace','CONTAINERS:spec.template.spec.containers.*.name','IMAGE:spec.template.spec.containers.*.image','LABELS:metadata.labels',"AVAILABLE_REPLICAS:status.availableReplicas",'READY_REPLICAS:status.readyReplicas' > /tmp/answer4
+
+FILE=/tmp/answer4
+if test -f "$FILE"; then
+    printf "Starting... \\n\\n"
+else
+    printf "Please submit your answer first\\n\\n"
+    exit 1
+fi
+
+rs=$(awk '{ a=$1 ; print a }'  /vagrant/resources/a/question4)
+namespace=$(awk '{ a=$2 ; print a }'  /vagrant/resources/a/question4)
+container=$(awk '{ a=$3 ; print a }'  /vagrant/resources/a/question4)
+image=$(awk '{ a=$4 ; print a }'  /vagrant/resources/a/question4)
+labels=$(awk '{ a=$5 ; print a }'  /vagrant/resources/a/question4)
+avrep=$(awk '{ a=$6 ; print a }'  /vagrant/resources/a/question4)
+redrep=$(awk '{ a=$7 ; print a }'  /vagrant/resources/a/question4)
+
+ars=$(awk '{ a=$1 ; print a }'  /tmp/answer4)
+anamespace=$(awk '{ a=$2 ; print a }'  /tmp/answer4)
+acontainer=$(awk '{ a=$3 ; print a }'  /tmp/answer4)
+aimage=$(awk '{ a=$4 ; print a }'  /tmp/answer4)
+alabels=$(awk '{ a=$5 ; print a }'  /tmp/answer4)
+aavrep=$(awk '{ a=$6 ; print a }'  /tmp/answer4)
+aredrep=$(awk '{ a=$7 ; print a }'  /tmp/answer4)
+
+if [ $rs == "$ars" ]; then echo "ReplicaSet Found"; else printf "ReplicaSet $rs not found in default namespace\\n\\n" && exit 1; fi
+if [ $container == "$acontainer" ]; then echo "Containers name correct"; else printf "Containers Name incorrect\\n\\n" && exit 1; fi
+if [ 5 == $aredrep ]; then printf "Pod Ready number is correct: $aredrep\\n\\n"; else printf "Pod Ready number is NOT correct: $aredrep\\n\\n" && exit 1; fi
+
+podsCorrectImage=$(kubectl get pods --no-headers  -n=default  -o=custom-columns='IMAGE:spec.containers[?(@.name=="myapp")].image' | grep -v none | grep memcached | wc -l)
+if [ $podsCorrectImage == 5 ]; then printf "ALL PODs running correct image\\n\\n"; else printf "NOT all PODs running correct image\\n\\n" && exit 1; fi
+
+printf "\\n\\n"
+echo "You can now delete the ReplicaSet my-replica-set"
+printf "Congratulations, you got that right!!!\\n\\n"
+
+rm /tmp/answer4

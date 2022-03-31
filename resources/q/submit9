@@ -1,0 +1,34 @@
+#!/bin/bash
+clear
+kubectl get deployments.apps nginx-deploy-1 --no-headers  -n=default  -o=custom-columns='NAME:metadata.name','NAMESPACE:metadata.namespace','IMAGE:spec.template.spec.containers[*].image','STRATEGY:spec.strategy.type','READY_REPLICAS:status.readyReplicas' > /tmp/answer9
+
+FILE=/tmp/answer9
+if test -f "$FILE"; then
+    printf "Starting... \\n\\n"
+else
+    printf "Please submit your answer first\\n\\n"
+    exit 1
+fi
+
+dep=$(awk '{ a=$1 ; print a }'  /vagrant/resources/a/question9)
+namespace=$(awk '{ a=$2 ; print a }'  /vagrant/resources/a/question9)
+image=$(awk '{ a=$3 ; print a }'  /vagrant/resources/a/question9)
+strategy=$(awk '{ a=$4 ; print a }'  /vagrant/resources/a/question9)
+redrep=$(awk '{ a=$5 ; print a }'  /vagrant/resources/a/question9)
+
+adep=$(awk '{ a=$1 ; print a }'  /tmp/answer9)
+anamespace=$(awk '{ a=$2 ; print a }'  /tmp/answer9)
+aimage=$(awk '{ a=$3 ; print a }'  /tmp/answer9)
+astrategy=$(awk '{ a=$4 ; print a }'  /tmp/answer9)
+aredrep=$(awk '{ a=$5 ; print a }'  /tmp/answer9)
+
+if [ $dep == "$adep" ]; then echo "Deployment Found"; else printf "Deployment $dep not found in default namespace\\n\\n" && exit 1; fi
+if [ $image == "$aimage" ]; then echo "Images correct"; else printf "Images incorrect\\n\\n" && exit 1; fi
+if [ $strategy == "$astrategy" ]; then echo "Strategy correct"; else printf "Strategy incorrect\\n\\n" && exit 1; fi
+if [ $redrep == "$aredrep" ]; then printf "Pod Ready number is correct: $redrep\\n\\n"; else printf "Pod Ready number is NOT correct: $redrep\\n\\n" && exit 1; fi
+
+printf "\\n\\n"
+echo "Do not delete the Deployments yet"
+printf "Congratulations, you got that right!!!\\n\\n"
+
+rm /tmp/answer9

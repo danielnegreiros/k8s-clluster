@@ -1,0 +1,41 @@
+#!/bin/bash
+clear
+kubectl get pods nginx -n=testing --no-headers -o=custom-columns='NAME:metadata.name','NAMESPACE:metadata.namespace','IMAGE:spec.containers.*.image','STATUS:.status.phase','LABELS:metadata.labels','NODENAME:spec.nodeName','CONTAINERS_READY:status.conditions[?(@.type=="ContainersReady")].status','POD_IP:status.podIP' > /tmp/submit14
+
+FILE=/tmp/submit14
+if test -f "$FILE"; then
+    printf "Starting... \\n\\n"
+else
+    printf "Please submit your answer first\\n\\n"
+    exit 1
+fi
+
+pod=$(awk '{ a=$1 ; print a }'  /vagrant/resources/a/question14)
+namespace=$(awk '{ a=$2 ; print a }'  /vagrant/resources/a/question14)
+image=$(awk '{ a=$3 ; print a }'  /vagrant/resources/a/question14)
+status=$(awk '{ a=$4 ; print a }'  /vagrant/resources/a/question14)
+labels=$(awk '{ a=$5 ; print a }'  /vagrant/resources/a/question14)
+node=$(awk '{ a=$6 ; print a }'  /vagrant/resources/a/question14)
+ready=$(awk '{ a=$7 ; print a }'  /vagrant/resources/a/question14)
+podip=$(awk '{ a=$8 ; print a }'  /vagrant/resources/a/question14)
+
+apod=$(awk '{ a=$1 ; print a }'  /tmp/submit14)
+anamespace=$(awk '{ a=$2 ; print a }'  /tmp/submit14)
+aimage=$(awk '{ a=$3 ; print a }'  /tmp/submit14)
+astatus=$(awk '{ a=$4 ; print a }'  /tmp/submit14)
+alabels=$(awk '{ a=$5 ; print a }'  /tmp/submit14)
+anode=$(awk '{ a=$6 ; print a }'  /tmp/submit14)
+aready=$(awk '{ a=$7 ; print a }'  /tmp/submit14)
+apodip=$(awk '{ a=$8 ; print a }'  /tmp/submit14)
+
+if [ $pod == "$apod" ]; then echo "Pod Found"; else printf "Pod $pod not found in the proper namespace\\n\\n" && exit 1; fi
+if [ $namespace == "$anamespace" ]; then echo "Namespace Correct: $namespace"; else printf "Incorrect namespace\\n\\n" && exit 1; fi
+if [ $image == "$aimage" ]; then echo "Image correct"; else printf "Image incorrect\\n\\n" && exit 1; fi
+if [ $status == "$astatus" ]; then echo "Pod Running"; else printf "Pod $pod not running\\n\\n" && exit 1; fi
+if [ $ready == "$aready" ]; then echo "Pod Ready"; else printf "Pod NOT Ready\\n\\n" && exit 1; fi
+
+printf "\\n\\n"
+echo "You can now delete the nginx POD"
+printf "Congratulations, you got that right!!!\\n\\n"
+
+rm /tmp/submit14

@@ -1,0 +1,4 @@
+#!/bin/bash
+clear
+printf "Hint: You can take a look at https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/#example\\n"
+printf "Make use of 'kubectl explain replicaset' if you find useful\\n\\n"

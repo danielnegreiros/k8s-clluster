@@ -1,0 +1,9 @@
+#!/bin/bash
+clear
+
+echo "Execute ./testing.sh and see both deployments properly working"
+echo "Check the deployment images with this command: kubectl get deployments.apps -o wide"
+echo "Take also a look at the pods: kubectl get pods"
+echo "Use set image help to construct an updating image command: kubectl set image -h"
+echo "Right after updating the image use ./testing.sh and observe service".
+printf "Do it for both Deployment\\n\\\n"

@@ -1,0 +1,1 @@
+my-replica-set   default   myapp   consul   map[app:guestbook tier:frontend]   2     2

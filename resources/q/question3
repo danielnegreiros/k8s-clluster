@@ -1,0 +1,8 @@
+#!/bin/bash
+clear
+echo "Question 3: Create a multi-container pod named my-multi-pod with:"
+echo "First container name client, image ubuntu, also add the property 'tty: true'"
+echo "Second container name my-key-value-db, image redis"
+printf "Second container name my-nosql-db, image mongo\\n\\n"
+printf "To Submit type: submit3\\n"
+printf "To get a hint  type: hint3\\n\\n"

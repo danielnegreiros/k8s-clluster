@@ -1,0 +1,11 @@
+#!/bin/bash
+clear
+
+echo "Question 8: You must have notice that deployment 1 failed for a while,"
+echo "at the same time deployment 2 didn't go down for a second".
+echo "Try to figure out the reason and fix nginx deployment 1"
+echo "After fixing the problem update again the image of deployment 1 to nginx:1.18 and test it again with ./testing.sh"
+echo ""
+echo ""
+printf "To Submit type: submit8\\n"
+printf "To get a hint  type: hint8\\n\\n"
