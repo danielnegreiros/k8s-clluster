@@ -41,6 +41,14 @@ EOF
 # Apply sysctl parameters without reboot to current running environment
 sudo sysctl --system
 
+# Fix repo
+cd /etc/yum.repos.d/
+sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+# Apply sysctl parameters without reboot to current running environment
+sudo sysctl --system
+
 ## set NTP
 timedatectl set-timezone America/Sao_Paulo
 yum update -y
@@ -54,7 +62,8 @@ sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml
 
 # Configure SystemdCgroup
-sudo sed -i 's/.containerd.runtimes.runc.options]/.containerd.runtimes.runc.options]\'$'\n                   SystemdCgroup = true/g' /etc/containerd/config.toml
+sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+# sudo sed -i 's/.containerd.runtimes.runc.options]/.containerd.runtimes.runc.options]\'$'\n                   SystemdCgroup = true/g' /etc/containerd/config.toml
 
 ## Enable and start docker
 systemctl start containerd && systemctl enable containerd
@@ -75,31 +84,31 @@ yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable --now kubelet
 
 ## Set basic Iptables
-systemctl enable firewalld
-systemctl start firewalld
-firewall-cmd --add-masquerade --permanent
-firewall-cmd --add-port=30000-32767/tcp --permanent
-firewall-cmd --add-port=22/tcp --permanent
-firewall-cmd --add-port=80/tcp  --permanent
-firewall-cmd --add-port=8000/tcp  --permanent
-firewall-cmd --add-port=8080/tcp  --permanent
-firewall-cmd --add-port=443/tcp  --permanent
-firewall-cmd --add-port=4443/tcp  --permanent
-firewall-cmd --add-port=6443/tcp  --permanent
-firewall-cmd --add-port=8443/tcp  --permanent
-firewall-cmd --add-port=6783/tcp  --permanent
-firewall-cmd --add-port=2376/tcp  --permanent
-firewall-cmd --add-port=2379/tcp  --permanent
-firewall-cmd --add-port=2380/tcp  --permanent
-firewall-cmd --add-port=2377/tcp  --permanent
-firewall-cmd --add-port=7946/tcp  --permanent
-firewall-cmd --add-port=7946/udp  --permanent
-firewall-cmd --add-port=4789/tcp  --permanent
-firewall-cmd --add-port=4789/udp  --permanent
-firewall-cmd --add-port=10250/tcp --permanent
-firewall-cmd --add-port=10251/tcp --permanent
-firewall-cmd --add-port=10252/tcp --permanent
-sudo firewall-cmd --reload
+# systemctl enable firewalld
+# systemctl start firewalld
+# firewall-cmd --add-masquerade --permanent
+# firewall-cmd --add-port=30000-32767/tcp --permanent
+# firewall-cmd --add-port=22/tcp --permanent
+# firewall-cmd --add-port=80/tcp  --permanent
+# firewall-cmd --add-port=8000/tcp  --permanent
+# firewall-cmd --add-port=8080/tcp  --permanent
+# firewall-cmd --add-port=443/tcp  --permanent
+# firewall-cmd --add-port=4443/tcp  --permanent
+# firewall-cmd --add-port=6443/tcp  --permanent
+# firewall-cmd --add-port=8443/tcp  --permanent
+# firewall-cmd --add-port=6783/tcp  --permanent
+# firewall-cmd --add-port=2376/tcp  --permanent
+# firewall-cmd --add-port=2379/tcp  --permanent
+# firewall-cmd --add-port=2380/tcp  --permanent
+# firewall-cmd --add-port=2377/tcp  --permanent
+# firewall-cmd --add-port=7946/tcp  --permanent
+# firewall-cmd --add-port=7946/udp  --permanent
+# firewall-cmd --add-port=4789/tcp  --permanent
+# firewall-cmd --add-port=4789/udp  --permanent
+# firewall-cmd --add-port=10250/tcp --permanent
+# firewall-cmd --add-port=10251/tcp --permanent
+# firewall-cmd --add-port=10252/tcp --permanent
+# sudo firewall-cmd --reload
 
 ## Disable swap (Kubernetes requirement)
 swapoff -a
@@ -132,8 +141,6 @@ echo "|  git: https://gitlab.com/danielnegreirosb/k8s-cluster.git  |"
 echo "|------------------------------------------------------------|"
 EOF
 
-# Fix proper interface in the kubeadm config file
-sudo sed -i "s/config.yaml/config.yaml --node-ip=$1/g" /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
 
 ## ssh no host check
 su - vagrant -c "echo 'alias ssh=\"ssh -o StrictHostKeyChecking=no\"' >> ~/.bashrc"
@@ -141,3 +148,9 @@ su - vagrant -c "echo 'alias scp=\"scp -o StrictHostKeyChecking=no\"' >> ~/.bash
 
 ## Allow members to perform ssh to other hosts to fetch join command
 su - vagrant -c "echo \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDebBanpsJE2nh63sFRyHK8w0lK50CE1lY7jn2r4qwXQjsI/b3JIfIcnCy+ZGLs51AAvwpBG7JWyYDZtipfHDJqAkI4v6hcduHyGCOPi6K7HkhGIJxHy6n6yEjCWllUlPVyEqnhQZBtb1gBbWni/9UcwWWnyRCLZakFp1MwWfOK8K3YyEx41whoa8gqAruyimaLHOfes/GnDOY84e7szu/QZUeONKKvQwvX7NRuncrKgtZqyEACcwfrCUBBcfaQaCxXpB7p4s0BIpdEXYEZsJw4RRS/mWWpBD23p29NCUXsc09hf1nH0L0VfSt3u32y0cYNC1HQtOiSNku6Yy05foaB vagrant@worker01\" >> ~/.ssh/authorized_keys"
+
+# Fix proper interface in the kubeadm config file
+sudo sed -i "s/config.yaml/config.yaml --node-ip=$1/g" /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+# Resart Containerd
+sudo systemctl restart containerd

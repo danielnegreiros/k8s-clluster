@@ -1,7 +1,7 @@
 nodes = [
-  { :hostname => 'k8s-master',   :ip => '192.168.50.10', :ram => 2048, :box => 'CrunchyData/rocky8',  :forPort => 2100, :cidr => '192.168.50.0/24' } ,
-  { :hostname => 'k8s-worker01',  :ip => '192.168.50.20', :ram => 1024, :box => 'CrunchyData/rocky8', :forPort => 2101 } ,
-  { :hostname => 'k8s-worker02',  :ip => '192.168.50.30', :ram => 1024, :box => 'CrunchyData/rocky8', :forPort => 2102 }
+  { :hostname => 'k8s-master',   :ip => '192.168.50.10', :ram => 4096, :box => 'centos/8',  :forPort => 2100, :cidr => '192.168.50.0/24' } ,
+  { :hostname => 'k8s-worker01',  :ip => '192.168.50.20', :ram => 2048, :box => 'centos/8', :forPort => 2101 } ,
+  { :hostname => 'k8s-worker02',  :ip => '192.168.50.30', :ram => 2048, :box => 'centos/8', :forPort => 2102 }
 ]
 
 Vagrant.configure("2") do |config|
