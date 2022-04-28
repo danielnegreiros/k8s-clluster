@@ -7,6 +7,7 @@ fea_dash=$5
 fea_helm=$6
 fea_met=$7
 fea_mlb=$8
+fea_dsc=$9
 
 set_conn(){
     ## Allow password ssh
@@ -18,6 +19,9 @@ set_conn(){
     echo 'alias ssh="ssh -o StrictHostKeyChecking=no"' >> ~/.bashrc
     echo 'alias scp="scp -o StrictHostKeyChecking=no"' >> ~/.bashrc
 
+}
+
+copy_keys(){
     ## Copy keys
     this_user=$USER
 	sudo cp /vagrant/scripts/id_rsa ~/.ssh/
@@ -28,6 +32,7 @@ set_conn(){
     ## Allow members to perform ssh to other hosts to fetch join command
     cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 }
+
 
 fix_hosts(){
     sudo sed -i '/127.0.1.1 k8s/d' /etc/hosts
@@ -218,20 +223,182 @@ fea_mlb_ac(){
 	kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 }
 
+set_nfs(){
+    sudo apt install nfs-kernel-server -y
+    sudo systemctl start nfs-server
+    sudo systemctl enable nfs-server
+    sudo mkdir -p /srv/nfs/mydata
+    sudo chmod -R 777 /srv/nfs/mydata  # for simple use but not advised
+
+    sudo tee /etc/exports << EOF 
+    /srv/nfs/mydata  *(rw,sync,no_subtree_check,no_root_squash,insecure)
+EOF
+
+    sudo exportfs -rv
+    showmount -e
+    sudo systemctl restart nfs-server
+}
+
+wa_conn_bug(){
+    sudo yum install fping -y
+    echo 'fping  -g 192.168.0.0/24 -c 5' >> ~/.bashrc
+}
+
+create_dync_sc_prov(){
+    kubectl create ns provisioner
+    sudo yum install nfs-utils -y
+    mkdir provisioner
+    cd provisioner
+
+    tee rbac.yaml << EOF
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: nfs-pod-provisioner-sa
+  namespace: provisioner
+---
+kind: ClusterRole # Role of kubernetes
+apiVersion: rbac.authorization.k8s.io/v1 # auth API
+metadata:
+  name: nfs-provisioner-clusterRole
+rules:
+  - apiGroups: [""] # rules on persistentvolumes
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "update", "patch"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: nfs-provisioner-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: nfs-pod-provisioner-sa # defined on top of file
+    namespace: provisioner
+roleRef: # binding cluster role to service account
+  kind: ClusterRole
+  name: nfs-provisioner-clusterRole # name defined in clusterRole
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: nfs-pod-provisioner-otherRoles
+  namespace: provisioner
+rules:
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: nfs-pod-provisioner-otherRoles
+  namespace: provisioner
+subjects:
+  - kind: ServiceAccount
+    name: nfs-pod-provisioner-sa # same as top of the file
+    # replace with namespace where provisioner is deployed
+    namespace: provisioner
+roleRef:
+  kind: Role
+  name: nfs-pod-provisioner-otherRoles
+  apiGroup: rbac.authorization.k8s.io
+EOF
+
+    # Apply
+    kubectl apply -f rbac.yaml
+
+    tee sc.yaml << EOF 
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  namespace: provisioner
+  name: nfs-storageclass  # IMPORTANT pvc needs to mention this name
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: nfs-provisioner   # name can be anything
+reclaimPolicy: Delete
+parameters:
+  archiveOnDelete: "false"
+EOF
+
+    # Apply
+    kubectl apply -f sc.yaml
+
+    tee provisioner.yaml << EOF 
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nfs-client-provisioner
+  namespace: provisioner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner
+    spec:
+      serviceAccountName: nfs-pod-provisioner-sa
+      containers:
+        - name: nfs-client-provisioner
+          image: k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          volumeMounts:
+            - name: nfs-client-root
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              value: nfs-provisioner
+            - name: NFS_SERVER
+              value: NFS_IP
+            - name: NFS_PATH
+              value: /srv/nfs/mydata/
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            server: NFS_IP
+            path: /srv/nfs/mydata/
+EOF
+
+    # Apply
+    nfs_ip=$(awk /nfs/'{print $1}' /etc/hosts)
+    sed -i  s/NFS_IP/$nfs_ip/g provisioner.yaml
+    kubectl apply -f provisioner.yaml
+
+    cd ~ 
+}
+
 # Starting ....
 set_conn
-fix_hosts
-config_modules
-# Set timezone
 sudo timedatectl set-timezone America/Sao_Paulo
 
-fix_repo
-install_containerd_pkgs
-install_kubernetes
-set_banner
+if [[ $role = master ]] || [[ $role = worker ]] ; then
+    # Common actions
+    copy_keys
+    fix_hosts
+    config_modules
 
-# Resart Containerd
-sudo systemctl restart containerd
+    fix_repo
+    install_containerd_pkgs
+    install_kubernetes
+    set_banner
+
+    # Resart Containerd
+    sudo systemctl restart containerd
+fi
 
 if [[ $role = master ]]; then
     set_questions
@@ -257,11 +424,25 @@ if [[ $role = master ]]; then
         fea_mlb_ac
     fi
 	
+
+    if [[ $fea_dsc = "Y" ]]; then
+        create_dync_sc_prov
+    fi
+    
+    # wa_conn_bug
+    create_dync_sc_prov
 fi
 
 if [[ $role = worker ]]; then
     config_worker  	
 fi
+
+
+if [[ $role = nfs ]]; then
+    set_conn
+    set_nfs  	
+fi
+
 
 # Bye 
 sleep 30
